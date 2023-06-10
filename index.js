@@ -31,6 +31,7 @@ async function run() {
     await client.connect();
 
     const usersCollection = client.db("languageAcademyDb").collection("users");
+    const courseCollection = client.db("languageAcademyDb").collection("courses");
 
 
 
@@ -53,6 +54,13 @@ async function run() {
       const result = await usersCollection.insertOne(user);
       res.send(result);
     });
+
+
+    // courses related apis
+    app.get('/courses', async (req, res) => {
+      const result = await courseCollection.find().toArray();
+      res.send(result);
+    })
 
 
 
