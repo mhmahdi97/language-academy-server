@@ -36,10 +36,20 @@ async function run() {
 
 
     // users related apis
-    app.get('/users', async (req, res) => {
+    app.get('/all-users', async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
     });
+
+    app.get('/users', async (req, res) => {
+      let query = {};
+      if (req.query.role) {
+        query = {role: req.query.role}
+      }
+    
+      const result = await usersCollection.find(query).toArray();
+      res.send(result)
+    })
 
 
     app.post('/users', async (req, res) => {
