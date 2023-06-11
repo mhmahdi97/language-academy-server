@@ -89,12 +89,6 @@ async function run() {
       res.send(result);
     });
 
-     app.post('/selected-courses', async (req, res) => {
-      const item = req.body;
-      const result = await selectedCourseCollection.insertOne(item);
-      res.send(result);
-    });
-
     app.get('/selected-courses-user', async (req, res) => {
       let query = {};
       if (req.query.email) {
@@ -105,6 +99,11 @@ async function run() {
       res.send(result)
     });
 
+     app.post('/selected-courses', async (req, res) => {
+      const item = req.body;
+      const result = await selectedCourseCollection.insertOne(item);
+      res.send(result);
+    });
 
 
 
