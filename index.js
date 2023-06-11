@@ -67,9 +67,19 @@ async function run() {
 
 
     // courses related apis
-    app.get('/courses', async (req, res) => {
+    app.get('/all-courses', async (req, res) => {
       const result = await courseCollection.find().toArray();
       res.send(result);
+    })
+
+    app.get('/courses', async (req, res) => {
+      let query = {};
+      if (req.query.status) {
+        query = {status: req.query.status}
+      }
+    
+      const result = await courseCollection.find(query).toArray();
+      res.send(result)
     })
 
 
