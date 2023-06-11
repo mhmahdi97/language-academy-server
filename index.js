@@ -50,7 +50,7 @@ async function run() {
     
       const result = await usersCollection.find(query).toArray();
       res.send(result)
-    })
+    });
 
 
     app.post('/users', async (req, res) => {
@@ -71,7 +71,7 @@ async function run() {
     app.get('/all-courses', async (req, res) => {
       const result = await courseCollection.find().toArray();
       res.send(result);
-    })
+    });
 
     app.get('/courses', async (req, res) => {
       let query = {};
@@ -81,12 +81,28 @@ async function run() {
     
       const result = await courseCollection.find(query).toArray();
       res.send(result)
-    })
+    });
 
     // selected courses related apis
     app.get('/selected-courses', async (req, res) => {
       const result = await selectedCourseCollection.find().toArray();
       res.send(result);
+    });
+
+     app.post('/selected-courses', async (req, res) => {
+      const item = req.body;
+      const result = await selectedCourseCollection.insertOne(item);
+      res.send(result);
+    });
+
+    app.get('/selected-courses-user', async (req, res) => {
+      let query = {};
+      if (req.query.email) {
+        query = {email: req.query.email}
+      }
+    
+      const result = await selectedCourseCollection.find(query).toArray();
+      res.send(result)
     });
 
 
