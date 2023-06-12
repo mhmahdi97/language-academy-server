@@ -113,14 +113,21 @@ async function run() {
     //   res.send(result);
     // });
 
-    app.get('/selected-courses', async (req, res) => {
-      let query = {};
-      if (req.query.email) {
-        query = {email: req.query.email}
+    app.get('/selected-courses', verifyJWT, async (req, res) => {
+      const email = req.query.email;
+
+      if (!email) {
+        res.send([]);
       }
-    
+
+      const decodedEmail = req.decoded.email;
+      if (email !== decodedEmail) {
+        return res.status(403).send({ error: true, message: 'forbidden access' })
+      }
+
+      const query = { email: email };
       const result = await selectedCourseCollection.find(query).toArray();
-      res.send(result)
+      res.send(result);
     });
 
      app.post('/selected-courses', async (req, res) => {
