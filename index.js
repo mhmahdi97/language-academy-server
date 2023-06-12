@@ -1,6 +1,7 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const app = express();
 require('dotenv').config();
 const port = process.env.PORT || 5000;
@@ -34,7 +35,14 @@ async function run() {
     const courseCollection = client.db("languageAcademyDb").collection("courses");
     const selectedCourseCollection = client.db("languageAcademyDb").collection("selectedCourses");
 
+    app.post('/jwt', (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
 
+      res.send({ token })
+    })
+
+    console.log(process.env.ACCESS_TOKEN_SECRET)
 
     // users related apis
     app.get('/all-users', async (req, res) => {
@@ -105,7 +113,7 @@ async function run() {
       res.send(result);
     });
 
-    app.delete('/selected-courses:id', async (req, res) => {
+    app.delete('/selected-courses/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await selectedCourseCollection.deleteOne(query);
