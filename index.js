@@ -84,12 +84,12 @@ async function run() {
     });
 
     // selected courses related apis
-    app.get('/selected-courses', async (req, res) => {
-      const result = await selectedCourseCollection.find().toArray();
-      res.send(result);
-    });
+    // app.get('/selected-courses', async (req, res) => {
+    //   const result = await selectedCourseCollection.find().toArray();
+    //   res.send(result);
+    // });
 
-    app.get('/selected-courses-user', async (req, res) => {
+    app.get('/selected-courses', async (req, res) => {
       let query = {};
       if (req.query.email) {
         query = {email: req.query.email}
