@@ -102,6 +102,10 @@ async function run() {
       if (req.query.status) {
         query = {status: req.query.status}
       }
+
+      if (req.query.email) {
+        query = {email: req.query.email}
+      }
     
       const result = await courseCollection.find(query).toArray();
       res.send(result)
@@ -110,7 +114,7 @@ async function run() {
     app.post('/courses', async (req, res) => {
       const newCourse = req.body;
       const result = await courseCollection.insertOne(newCourse);
-      req.send(result);
+      res.send(result);
     })
 
     // selected courses related apis
