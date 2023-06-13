@@ -150,6 +150,20 @@ async function run() {
       const result = await courseCollection.updateOne(filter, updateDoc);
       res.send(result);
     })
+    
+    app.patch('/courses/feedback/:id', async (req, res) => {
+      const id = req.params.id;
+      const feedback = req.body.feedback;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          feedback: feedback
+        },
+      };
+
+      const result = await courseCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    })
 
     // selected courses related apis
     // app.get('/selected-courses', async (req, res) => {
