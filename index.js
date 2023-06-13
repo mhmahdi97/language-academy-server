@@ -125,6 +125,19 @@ async function run() {
       res.send(result);
     })
 
+    app.patch('/courses/approved/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          status: 'approved'
+        },
+      };
+
+      const result = await courseCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    })
+
     // selected courses related apis
     // app.get('/selected-courses', async (req, res) => {
     //   const result = await selectedCourseCollection.find().toArray();
