@@ -99,14 +99,24 @@ async function run() {
 
     app.get('/courses', async (req, res) => {
       let query = {};
+
       if (req.query.status) {
         query = {status: req.query.status}
       }
 
-      if (req.query.email) {
-        query = {email: req.query.email}
+      else if (req.query.instructorEmail) {
+        query = {instructorEmail: req.query.instructorEmail}
       }
-    
+
+      // const instructorEmail = req.query.instructorEmail;
+      // const status = req.query.status;
+
+      // if(!status && !instructorEmail) {
+      //   res.send([]);
+      // }
+      
+      // const query = { status: status, instructorEmail: instructorEmail };
+      
       const result = await courseCollection.find(query).toArray();
       res.send(result)
     });
