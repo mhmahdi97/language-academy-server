@@ -107,15 +107,17 @@ async function run() {
       else if (req.query.instructorEmail) {
         query = {instructorEmail: req.query.instructorEmail}
       }
-
-      // const instructorEmail = req.query.instructorEmail;
-      // const status = req.query.status;
-
-      // if(!status && !instructorEmail) {
-      //   res.send([]);
-      // }
       
-      // const query = { status: status, instructorEmail: instructorEmail };
+      const result = await courseCollection.find(query).toArray();
+      res.send(result)
+    });
+
+    app.get('/instructor-courses', async (req, res) => {
+      let query = {};
+
+      if (req.query.instructorEmail) {
+        query = {instructorEmail: req.query.instructorEmail}
+      }
       
       const result = await courseCollection.find(query).toArray();
       res.send(result)
