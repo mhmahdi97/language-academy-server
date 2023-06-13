@@ -107,6 +107,12 @@ async function run() {
       res.send(result)
     });
 
+    app.post('/courses', async (req, res) => {
+      const newCourse = req.body;
+      const result = await courseCollection.insertOne(newCourse);
+      req.send(result);
+    })
+
     // selected courses related apis
     // app.get('/selected-courses', async (req, res) => {
     //   const result = await selectedCourseCollection.find().toArray();
