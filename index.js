@@ -103,10 +103,6 @@ async function run() {
       if (req.query.status) {
         query = {status: req.query.status}
       }
-
-      else if (req.query.instructorEmail) {
-        query = {instructorEmail: req.query.instructorEmail}
-      }
       
       const result = await courseCollection.find(query).toArray();
       res.send(result)
