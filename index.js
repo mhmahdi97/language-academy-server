@@ -70,7 +70,7 @@ async function run() {
       next();
     }
     
-    // verify admin
+    // verify instructor
     const verifyInstructor = async (req, res, next) => {
       const email = req.decoded.email;
       const query = { email: email }
@@ -83,11 +83,14 @@ async function run() {
 
 
     // users related apis
-    app.get('/all-users', async (req, res) => {
+
+    // api to get all users
+    app.get('/all-users', verifyJWT, verifyAdmin, async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
     });
 
+    // api to get users by role to show instructors page
     app.get('/users', async (req, res) => {
       let query = {};
       if (req.query.role) {
@@ -98,12 +101,13 @@ async function run() {
       res.send(result)
     });
 
-    app.get('/users/admin/:email', async (req, res) => {
+    // api to get user is admin or not
+    app.get('/users/admin/:email', verifyJWT, async (req, res) => {
       const email = req.params.email;
 
-      // if (req.decoded.email !== email) {
-      //   res.send({ admin: false })
-      // }
+      if (req.decoded.email !== email) {
+        res.send({ admin: false })
+      }
 
       const query = { email: email }
       const user = await usersCollection.findOne(query);
@@ -111,12 +115,13 @@ async function run() {
       res.send(result);
     })
     
-    app.get('/users/instructor/:email', async (req, res) => {
+    // api to get user is instructor or not
+    app.get('/users/instructor/:email', verifyJWT, async (req, res) => {
       const email = req.params.email;
 
-      // if (req.decoded.email !== email) {
-      //   res.send({ admin: false })
-      // }
+      if (req.decoded.email !== email) {
+        res.send({ instructor: false })
+      }
 
       const query = { email: email }
       const user = await usersCollection.findOne(query);
@@ -124,7 +129,7 @@ async function run() {
       res.send(result);
     })
 
-
+    // api to store all users during registration and social login
     app.post('/users', async (req, res) => {
       const user = req.body;
       const query = { email: user.email }
@@ -138,6 +143,7 @@ async function run() {
       res.send(result);
     });
 
+    // api to make user an admin
     app.patch('/users/admin/:id', async (req, res) => {
       const id = req.params.id;
       console.log(id);
@@ -153,6 +159,7 @@ async function run() {
 
     })
 
+    // api to make user an instructor
     app.patch('/users/instructor/:id', async (req, res) => {
       const id = req.params.id;
       console.log(id);
@@ -170,11 +177,13 @@ async function run() {
 
 
     // courses related apis
-    app.get('/all-courses', async (req, res) => {
-      const result = await courseCollection.find().toArray();
-      res.send(result);
-    });
 
+    // app.get('/all-courses', async (req, res) => {
+      //   const result = await courseCollection.find().toArray();
+      //   res.send(result);
+      // });
+      
+    // api to get all the approved courses to use courses page
     app.get('/courses', async (req, res) => {
       let query = {};
 
@@ -186,6 +195,7 @@ async function run() {
       res.send(result)
     });
 
+    // api to get specific courses by id
     app.get('/courses/:id', async (req, res) => {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
@@ -193,7 +203,8 @@ async function run() {
       res.send(result);
     })
 
-    app.get('/instructor-courses', async (req, res) => {
+    // api to get all the courses added by specific instructor
+    app.get('/instructor-courses', verifyJWT, verifyInstructor, async (req, res) => {
       let query = {};
 
       if (req.query.instructorEmail) {
@@ -204,12 +215,14 @@ async function run() {
       res.send(result)
     });
 
+    // api to add new course by instructor
     app.post('/courses', async (req, res) => {
       const newCourse = req.body;
       const result = await courseCollection.insertOne(newCourse);
       res.send(result);
     })
 
+    // api to approve new course by admin
     app.patch('/courses/approved/:id', async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -223,6 +236,7 @@ async function run() {
       res.send(result);
     })
     
+    // api to deny new course by admin
     app.patch('/courses/denied/:id', async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -236,6 +250,7 @@ async function run() {
       res.send(result);
     })
     
+    // api to give feedback denied courses by admin
     app.patch('/courses/feedback/:id', async (req, res) => {
       const id = req.params.id;
       const feedback = req.body.feedback;
@@ -256,6 +271,7 @@ async function run() {
     //   res.send(result);
     // });
 
+    // api to get selected courses by student
     app.get('/selected-courses', verifyJWT, async (req, res) => {
       const email = req.query.email;
 
@@ -273,12 +289,14 @@ async function run() {
       res.send(result);
     });
 
+    // api to select courses by student
      app.post('/selected-courses', async (req, res) => {
       const item = req.body;
       const result = await selectedCourseCollection.insertOne(item);
       res.send(result);
     });
 
+    // api to delete a selected course by studen
     app.delete('/selected-courses/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
