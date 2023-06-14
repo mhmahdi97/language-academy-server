@@ -294,7 +294,7 @@ async function run() {
       res.send(result);
     });
     
-    // api to selected course by id
+    // api to get selected course by id
      app.get('/selected-course/:id', async (req, res) => {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
