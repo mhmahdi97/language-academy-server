@@ -252,6 +252,21 @@ async function run() {
       const result = await courseCollection.updateOne(filter, updateDoc);
       res.send(result);
     })
+
+    // api to update available seats by payment
+    app.patch('/courses/:id', async (req, res) => {
+      const id = req.params.id;
+      const newSeats = req.body.newSeats;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          availableSeats: newSeats
+        },
+      };
+
+      const result = await courseCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    })
     
     // api to give feedback denied courses by admin
     app.patch('/courses/feedback/:id', async (req, res) => {
@@ -261,6 +276,20 @@ async function run() {
       const updateDoc = {
         $set: {
           feedback: feedback
+        },
+      };
+
+      const result = await courseCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    })
+
+     // api to decrease available seats
+    app.patch('/courses/approved/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          status: 'approved'
         },
       };
 
@@ -286,6 +315,24 @@ async function run() {
       const result = await selectedCourseCollection.find(query).toArray();
       res.send(result);
     });
+    
+    // api to get enrolled courses by student
+    app.get('/enrolled-courses', verifyJWT, async (req, res) => {
+      const email = req.query.email;
+
+      if (!email) {
+        res.send([]);
+      }
+
+      const decodedEmail = req.decoded.email;
+      if (email !== decodedEmail) {
+        return res.status(403).send({ error: true, message: 'forbidden access' })
+      }
+
+      const query = { email: email };
+      const result = await enrolledCourseCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // api to select courses by student
      app.post('/selected-courses', async (req, res) => {
@@ -302,7 +349,7 @@ async function run() {
       res.send(result);
     });
 
-    // api to delete a selected course by studen
+    // api to delete a selected course by studend
     app.delete('/selected-courses/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -313,8 +360,8 @@ async function run() {
 
     // create payment intent
     app.post('/create-payment-intent', verifyJWT, async (req, res) => {
-      const { price } = req.body;
-      const amount = parseInt(price * 100);
+      const { fixedPrice } = req.body;
+      const amount = parseInt(fixedPrice * 100);
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
         currency: 'usd',
@@ -331,21 +378,41 @@ async function run() {
       const payment = req.body;
       const id = payment._id;
       const paidCourseId = payment.selectedCourseId;
-      const availableSeats = payment.availableSeats;
-      const filter = { _id: new ObjectId(paidCourseId) };
-      const updateDoc = {
-        $set: {
-          availableSeats: availableSeats-1
-        },
-      };
-      const deleteQuery = { _id: new ObjectId(id) };
+      // const availableSeats = payment.availableSeats;
+      // const filter = { _id: new ObjectId(paidCourseId) };
+      // const updateDoc = {
+      //   $set: {
+      //     availableSeats: parseInt(availableSeats-1)
+      //   },
+      // };
+      // const deleteQuery = { _id: new ObjectId(id) };
 
       const insertResult = await enrolledCourseCollection.insertOne(payment);
-      const deleteResult = await selectedCourseCollection.deleteOne(deleteQuery);
-      const updateResult = await courseCollection.updateOne(filter, updateDoc);
+      // const deleteResult = await selectedCourseCollection.deleteOne(deleteQuery);
+      // const updateResult = await courseCollection.updateOne(filter, updateDoc);
 
       res.send({ insertResult, deleteResult, updateResult });
     })
+    
+    // app.post('/payments', verifyJWT, async (req, res) => {
+    //   const payment = req.body;
+    //   const id = payment._id;
+    //   const paidCourseId = payment.selectedCourseId;
+    //   // const availableSeats = payment.availableSeats;
+    //   // const filter = { _id: new ObjectId(paidCourseId) };
+    //   // const updateDoc = {
+    //   //   $set: {
+    //   //     availableSeats: parseInt(availableSeats-1)
+    //   //   },
+    //   // };
+    //   // const deleteQuery = { _id: new ObjectId(id) };
+
+    //   const insertResult = await enrolledCourseCollection.insertOne(payment);
+    //   // const deleteResult = await selectedCourseCollection.deleteOne(deleteQuery);
+    //   // const updateResult = await courseCollection.updateOne(filter, updateDoc);
+
+    //   res.send({ insertResult, deleteResult, updateResult });
+    // })
 
 
 
