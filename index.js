@@ -46,11 +46,12 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const usersCollection = client.db("languageAcademyDb").collection("users");
     const courseCollection = client.db("languageAcademyDb").collection("courses");
     const selectedCourseCollection = client.db("languageAcademyDb").collection("selectedCourses");
+    const paymentCollection = client.db("languageAcademyDb").collection("payments");
 
     app.post('/jwt', (req, res) => {
       const user = req.body;
@@ -178,10 +179,11 @@ async function run() {
 
     // courses related apis
 
-    // app.get('/all-courses', async (req, res) => {
-      //   const result = await courseCollection.find().toArray();
-      //   res.send(result);
-      // });
+    // api to get all the courses by admin
+    app.get('/all-courses', verifyJWT, verifyAdmin, async (req, res) => {
+        const result = await courseCollection.find().toArray();
+        res.send(result);
+      });
       
     // api to get all the approved courses to use courses page
     app.get('/courses', async (req, res) => {
@@ -265,11 +267,6 @@ async function run() {
       res.send(result);
     })
 
-    // selected courses related apis
-    // app.get('/selected-courses', async (req, res) => {
-    //   const result = await selectedCourseCollection.find().toArray();
-    //   res.send(result);
-    // });
 
     // api to get selected courses by student
     app.get('/selected-courses', verifyJWT, async (req, res) => {
@@ -312,7 +309,7 @@ async function run() {
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
