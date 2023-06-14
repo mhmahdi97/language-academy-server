@@ -293,6 +293,14 @@ async function run() {
       const result = await selectedCourseCollection.insertOne(item);
       res.send(result);
     });
+    
+    // api to selected course by id
+     app.get('/selected-courses/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await selectedCourseCollection.findOne(query);
+      res.send(result);
+    });
 
     // api to delete a selected course by studen
     app.delete('/selected-courses/:id', async (req, res) => {
@@ -331,15 +339,13 @@ async function run() {
         },
       };
       const deleteQuery = { _id: new ObjectId(id) };
-      
+
       const insertResult = await enrolledCourseCollection.insertOne(payment);
       const deleteResult = await selectedCourseCollection.deleteOne(deleteQuery);
       const updateResult = await courseCollection.updateOne(filter, updateDoc);
 
       res.send({ insertResult, deleteResult, updateResult });
     })
-
-
 
 
 
