@@ -52,7 +52,7 @@ async function run() {
     const usersCollection = client.db("languageAcademyDb").collection("users");
     const courseCollection = client.db("languageAcademyDb").collection("courses");
     const selectedCourseCollection = client.db("languageAcademyDb").collection("selectedCourses");
-    const paymentCollection = client.db("languageAcademyDb").collection("payments");
+    const enrolledCourseCollection = client.db("languageAcademyDb").collection("enrolledCourse");
 
     app.post('/jwt', (req, res) => {
       const user = req.body;
@@ -318,6 +318,26 @@ async function run() {
       })
     })
 
+    // payment related api
+    app.post('/payments', verifyJWT, async (req, res) => {
+      const payment = req.body;
+      const id = payment._id;
+      const paidCourseId = payment.selectedCourseId;
+      const availableSeats = payment.availableSeats;
+      const filter = { _id: new ObjectId(paidCourseId) };
+      const updateDoc = {
+        $set: {
+          availableSeats: availableSeats-1
+        },
+      };
+      const deleteQuery = { _id: new ObjectId(id) };
+      
+      const insertResult = await enrolledCourseCollection.insertOne(payment);
+      const deleteResult = await selectedCourseCollection.deleteOne(deleteQuery);
+      const updateResult = await courseCollection.updateOne(filter, updateDoc);
+
+      res.send({ insertResult, deleteResult, updateResult });
+    })
 
 
 
