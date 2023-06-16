@@ -284,6 +284,14 @@ async function run() {
       res.send(result);
     })
 
+    // api to delete a course by admin
+    app.delete('/delete-course/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await courseCollection.deleteOne(query);
+      res.send(result);
+    })
+
     // api to get selected courses by student
     app.get('/selected-courses', verifyJWT, async (req, res) => {
       const email = req.query.email;
