@@ -284,7 +284,7 @@ async function run() {
     })
 
      // api to decrease available seats
-    app.patch('/courses/approved/:id', async (req, res) => {
+    app.patch('/courses/decrease-seat/:id', async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
