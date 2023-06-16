@@ -252,49 +252,6 @@ async function run() {
       const result = await courseCollection.updateOne(filter, updateDoc);
       res.send(result);
     })
-
-    // api to update available seats by payment
-    app.patch('/courses/decrease-seat/:id', async (req, res) => {
-      const id = req.params.id;
-      const newSeats = req.body.newSeats;
-      console.log(id);
-      console.log(newSeats);
-      const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: {
-          availableSeats: newSeats
-        },
-      };
-
-      const result = await courseCollection.updateOne(filter, updateDoc);
-      res.send(result);
-    })
-    
-    // api to update available seats and enrolled students by payment
-    app.patch('/courses/update-seat/:id', async (req, res) => {
-      const id = req.params.id;
-      const newSeats = req.body.newSeats;
-      const newEnrolled = req.body.newEnrolled;
-      console.log(id);
-      console.log(newSeats);
-      console.log(newEnrolled);
-      const updateSeatsFilter = { _id: new ObjectId(id) };
-      const updateSeatsDoc = {
-        $set: {
-          availableSeats: newSeats
-        },
-      };
-      const updateEnrolledFilter = { _id: new ObjectId(id) };
-      const updateEnrolledDoc = {
-        $set: {
-          enrolled: newEnrolled
-        },
-      };
-
-      const updateSeatsResult = await courseCollection.updateOne(updateSeatsFilter, updateSeatsDoc);
-      const updateEnrolledResult = await courseCollection.updateOne(updateEnrolledFilter, updateEnrolledDoc);
-      res.send({updateSeatsResult, updateEnrolledResult});
-    })
     
     // api to give feedback denied courses by admin
     app.patch('/courses/feedback/:id', async (req, res) => {
@@ -406,44 +363,37 @@ async function run() {
     // payment related api
     app.post('/payments', verifyJWT, async (req, res) => {
       const payment = req.body;
-      const id = payment._id;
-      const paidCourseId = payment.selectedCourseId;
-      // const availableSeats = payment.availableSeats;
-      // const filter = { _id: new ObjectId(paidCourseId) };
-      // const updateDoc = {
-      //   $set: {
-      //     availableSeats: parseInt(availableSeats-1)
-      //   },
-      // };
-      // const deleteQuery = { _id: new ObjectId(id) };
-
       const insertResult = await enrolledCourseCollection.insertOne(payment);
-      // const deleteResult = await selectedCourseCollection.deleteOne(deleteQuery);
-      // const updateResult = await courseCollection.updateOne(filter, updateDoc);
+      res.send(insertResult);
+    })
 
-      res.send({ insertResult, deleteResult, updateResult });
+    // api to update available seats and enrolled students by payment
+    app.patch('/courses/update-seat/:id', async (req, res) => {
+      const id = req.params.id;
+      const newSeats = req.body.newSeats;
+      const newEnrolled = req.body.newEnrolled;
+      console.log(id);
+      console.log(newSeats);
+      console.log(newEnrolled);
+      const updateSeatsFilter = { _id: new ObjectId(id) };
+      const updateSeatsDoc = {
+        $set: {
+          availableSeats: newSeats
+        },
+      };
+      const updateEnrolledFilter = { _id: new ObjectId(id) };
+      const updateEnrolledDoc = {
+        $set: {
+          enrolled: newEnrolled
+        },
+      };
+
+      const updateSeatsResult = await courseCollection.updateOne(updateSeatsFilter, updateSeatsDoc);
+      const updateEnrolledResult = await courseCollection.updateOne(updateEnrolledFilter, updateEnrolledDoc);
+      res.send({updateSeatsResult, updateEnrolledResult});
     })
     
-    // app.post('/payments', verifyJWT, async (req, res) => {
-    //   const payment = req.body;
-    //   const id = payment._id;
-    //   const paidCourseId = payment.selectedCourseId;
-    //   // const availableSeats = payment.availableSeats;
-    //   // const filter = { _id: new ObjectId(paidCourseId) };
-    //   // const updateDoc = {
-    //   //   $set: {
-    //   //     availableSeats: parseInt(availableSeats-1)
-    //   //   },
-    //   // };
-    //   // const deleteQuery = { _id: new ObjectId(id) };
-
-    //   const insertResult = await enrolledCourseCollection.insertOne(payment);
-    //   // const deleteResult = await selectedCourseCollection.deleteOne(deleteQuery);
-    //   // const updateResult = await courseCollection.updateOne(filter, updateDoc);
-
-    //   res.send({ insertResult, deleteResult, updateResult });
-    // })
-
+   
 
 
 
