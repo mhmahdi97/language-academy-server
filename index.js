@@ -146,7 +146,7 @@ async function run() {
     });
 
     // api to make user an admin
-    app.patch('/users/admin/:id', async (req, res) => {
+    app.patch('/users/make-admin/:id', async (req, res) => {
       const id = req.params.id;
       console.log(id);
       const filter = { _id: new ObjectId(id) };
@@ -162,13 +162,29 @@ async function run() {
     })
 
     // api to make user an instructor
-    app.patch('/users/instructor/:id', async (req, res) => {
+    app.patch('/users/make-instructor/:id', async (req, res) => {
       const id = req.params.id;
       console.log(id);
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
           role: 'instructor'
+        },
+      };
+
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+
+    })
+    
+    // api to make user an instructor
+    app.patch('/users/make-user/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          role: 'user'
         },
       };
 
@@ -267,23 +283,6 @@ async function run() {
       const result = await courseCollection.updateOne(filter, updateDoc);
       res.send(result);
     })
-
-    //  // api to decrease available seats
-    // app.patch('/courses/approved/:id', async (req, res) => {
-    //   const id = req.params.id;
-    //   const newSeats = req.body.newSeats;
-    //   console.log(newSeats)
-    //   const filter = { _id: new ObjectId(id) };
-    //   const updateDoc = {
-    //     $set: {
-    //       availableSeats: newSeats
-    //     },
-    //   };
-
-    //   const result = await courseCollection.updateOne(filter, updateDoc);
-    //   res.send(result);
-    // })
-
 
     // api to get selected courses by student
     app.get('/selected-courses', verifyJWT, async (req, res) => {
