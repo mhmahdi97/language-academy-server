@@ -254,9 +254,11 @@ async function run() {
     })
 
     // api to update available seats by payment
-    app.patch('/courses/:id', async (req, res) => {
+    app.patch('/courses/decrease-seat/:id', async (req, res) => {
       const id = req.params.id;
       const newSeats = req.body.newSeats;
+      console.log(id);
+      console.log(newSeats);
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
@@ -266,6 +268,32 @@ async function run() {
 
       const result = await courseCollection.updateOne(filter, updateDoc);
       res.send(result);
+    })
+    
+    // api to update available seats and enrolled students by payment
+    app.patch('/courses/update-seat/:id', async (req, res) => {
+      const id = req.params.id;
+      const newSeats = req.body.newSeats;
+      const newEnrolled = req.body.newEnrolled;
+      console.log(id);
+      console.log(newSeats);
+      console.log(newEnrolled);
+      const updateSeatsFilter = { _id: new ObjectId(id) };
+      const updateSeatsDoc = {
+        $set: {
+          availableSeats: newSeats
+        },
+      };
+      const updateEnrolledFilter = { _id: new ObjectId(id) };
+      const updateEnrolledDoc = {
+        $set: {
+          enrolled: newEnrolled
+        },
+      };
+
+      const updateSeatsResult = await courseCollection.updateOne(updateSeatsFilter, updateSeatsDoc);
+      const updateEnrolledResult = await courseCollection.updateOne(updateEnrolledFilter, updateEnrolledDoc);
+      res.send({updateSeatsResult, updateEnrolledResult});
     })
     
     // api to give feedback denied courses by admin
@@ -283,20 +311,21 @@ async function run() {
       res.send(result);
     })
 
-     // api to decrease available seats
-    app.patch('/courses/approved/:id', async (req, res) => {
-      const id = req.params.id;
-      const newSeats = req.body.newSeats;
-      const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: {
-          availableSeats: newSeats
-        },
-      };
+    //  // api to decrease available seats
+    // app.patch('/courses/approved/:id', async (req, res) => {
+    //   const id = req.params.id;
+    //   const newSeats = req.body.newSeats;
+    //   console.log(newSeats)
+    //   const filter = { _id: new ObjectId(id) };
+    //   const updateDoc = {
+    //     $set: {
+    //       availableSeats: newSeats
+    //     },
+    //   };
 
-      const result = await courseCollection.updateOne(filter, updateDoc);
-      res.send(result);
-    })
+    //   const result = await courseCollection.updateOne(filter, updateDoc);
+    //   res.send(result);
+    // })
 
 
     // api to get selected courses by student
