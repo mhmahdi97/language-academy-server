@@ -194,7 +194,7 @@ async function run() {
     })
 
     // api to delete a user by admin
-    app.delete('/delete-user/:id', async (req, res) => {
+    app.delete('users/delete-user/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await usersCollection.deleteOne(query);
